@@ -81,6 +81,10 @@ RUN set -eux; \
 
 RUN chmod +x /opt/chrome/chrome
 
+# Create necessary directories with proper permissions
+RUN mkdir -p /app/.logs /app/.screenshots && \
+    chmod -R 777 /app/.logs /app/.screenshots
+
 RUN pip3 install --upgrade pip setuptools wheel
 
 COPY requirements.txt .

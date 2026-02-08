@@ -15,6 +15,10 @@ try:
 except ImportError:
     print(Fore.RED + "Speech To Text disabled." + Fore.RESET)
     IMPORT_FOUND = False
+    # Create mock pyaudio to allow class definition to succeed
+    class MockPyAudio:
+        paInt16 = 1
+    pyaudio = MockPyAudio()
 
 audio_queue = queue.Queue()
 done = False
@@ -23,7 +27,7 @@ class AudioRecorder:
     """
     AudioRecorder is a class that records audio from the microphone and adds it to the audio queue.
     """
-    def __init__(self, format: int = pyaudio.paInt16, channels: int = 1, rate: int = 4096, chunk: int = 8192, record_seconds: int = 5, verbose: bool = False):
+    def __init__(self, format: int = 16, channels: int = 1, rate: int = 4096, chunk: int = 8192, record_seconds: int = 5, verbose: bool = False):
         self.format = format
         self.channels = channels
         self.rate = rate

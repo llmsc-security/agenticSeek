@@ -101,33 +101,40 @@ def initialize_system():
     )
     logger.info("Browser initialized")
 
-    agents = [
-        CasualAgent(
-            name=config["MAIN"]["agent_name"],
-            prompt_path=f"prompts/{personality_folder}/casual_agent.txt",
-            provider=provider, verbose=False
-        ),
-        CoderAgent(
-            name="coder",
-            prompt_path=f"prompts/{personality_folder}/coder_agent.txt",
-            provider=provider, verbose=False
-        ),
-        FileAgent(
-            name="File Agent",
-            prompt_path=f"prompts/{personality_folder}/file_agent.txt",
-            provider=provider, verbose=False
-        ),
-        BrowserAgent(
+    agents = []
+
+    # Add core agents
+    agents.append(CasualAgent(
+        name=config["MAIN"]["agent_name"],
+        prompt_path=f"prompts/{personality_folder}/casual_agent.txt",
+        provider=provider, verbose=False
+    ))
+    agents.append(CoderAgent(
+        name="coder",
+        prompt_path=f"prompts/{personality_folder}/coder_agent.txt",
+        provider=provider, verbose=False
+    ))
+    agents.append(FileAgent(
+        name="File Agent",
+        prompt_path=f"prompts/{personality_folder}/file_agent.txt",
+        provider=provider, verbose=False
+    ))
+
+    # BrowserAgent requires SearxNG which may not be available in Docker
+    # Skip it if SEARXNG_BASE_URL is not set
+    searxng_url = os.getenv("SEARXNG_BASE_URL")
+    if searxng_url:
+        agents.append(BrowserAgent(
             name="Browser",
             prompt_path=f"prompts/{personality_folder}/browser_agent.txt",
             provider=provider, verbose=False, browser=browser
-        ),
-        PlannerAgent(
-            name="Planner",
-            prompt_path=f"prompts/{personality_folder}/planner_agent.txt",
-            provider=provider, verbose=False, browser=browser
-        )
-    ]
+        ))
+
+    agents.append(PlannerAgent(
+        name="Planner",
+        prompt_path=f"prompts/{personality_folder}/planner_agent.txt",
+        provider=provider, verbose=False, browser=browser
+    ))
     logger.info("Agents initialized")
 
     interaction = Interaction(

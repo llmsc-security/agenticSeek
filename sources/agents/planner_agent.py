@@ -17,6 +17,9 @@ class PlannerAgent(Agent):
         The planner agent is a special agent that divides and conquers the task.
         """
         super().__init__(name, prompt_path, provider, verbose, None)
+        import os
+        searxng_url = os.getenv("SEARXNG_BASE_URL")
+
         self.tools = {
             "json": Tools()
         }
@@ -25,9 +28,11 @@ class PlannerAgent(Agent):
         self.agents = {
             "coder": CoderAgent(name, "prompts/base/coder_agent.txt", provider, verbose=False),
             "file": FileAgent(name, "prompts/base/file_agent.txt", provider, verbose=False),
-            "web": BrowserAgent(name, "prompts/base/browser_agent.txt", provider, verbose=False, browser=browser),
             "casual": CasualAgent(name, "prompts/base/casual_agent.txt", provider, verbose=False)
         }
+        # Only add web agent if SearxNG is available
+        if searxng_url:
+            self.agents["web"] = BrowserAgent(name, "prompts/base/browser_agent.txt", provider, verbose=False, browser=browser)
         self.role = "planification"
         self.type = "planner_agent"
         self.memory = Memory(self.load_prompt(prompt_path),
